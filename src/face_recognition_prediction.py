@@ -110,7 +110,7 @@ if __name__ == "__main__":
         '..',
         'persons',
         'Moamn',
-        'elon.jpeg',
+        'tramp.jpeg',
     )
 
     results = predict(test_image_path)
