@@ -1,7 +1,7 @@
 import os
 import tempfile
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import face_recognition
 from typing import List
@@ -29,6 +29,7 @@ app.add_middleware(
 base_dir = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(base_dir, '..', 'model', 'trained_knn_model.clf')
 TRAIN_DIR = os.path.join(base_dir, '..', 'persons')
+CLIENT_HTML_PATH = os.path.join(base_dir, 'client.html')
 
 # Global model cache
 _model_cache = None
@@ -63,6 +64,20 @@ async def health_check():
         "model_exists": os.path.exists(MODEL_PATH),
         "training_data_exists": os.path.exists(TRAIN_DIR),
     }
+
+
+@app.get("/")
+async def root():
+    """Serve the built-in web client on the app root."""
+    if not os.path.exists(CLIENT_HTML_PATH):
+        raise HTTPException(status_code=404, detail="client.html not found")
+    return FileResponse(CLIENT_HTML_PATH)
+
+
+@app.get("/client")
+async def client_page():
+    """Alias route for the web client page."""
+    return await root()
 
 
 @app.post("/predict")
