@@ -1,0 +1,18 @@
+{
+  "name": "face-recognition-vercel",
+  "version": "1.0.0",
+  "description": "Face Recognition API - Vercel Deployment",
+  "private": true,
+  "scripts": {
+    "build": "mkdir -p public && cp src/client.html public/index.html",
+    "dev": "python src/app.py",
+    "start": "python src/app.py"
+  },
+  "keywords": [
+    "face-recognition",
+    "knn",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT"
+}

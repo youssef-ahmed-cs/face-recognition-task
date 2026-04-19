@@ -1,0 +1,10 @@
+node_modules/
+.git/
+.env.local
+.env.*.local
+model/
+persons/
+src/__pycache__/
+*.pyc
+.DS_Store
+*.ipynb_checkpoints
