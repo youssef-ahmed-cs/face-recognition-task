@@ -1,0 +1,10 @@
+[phases.setup]
+nixPkgs = ["python3", "gcc", "cmake"]
+
+[phases.install]
+cmds = [
+  "python -m venv /opt/venv",
+  ". /opt/venv/bin/activate",
+  "pip install --upgrade pip",
+  "pip install -r requirements.txt"
+]
