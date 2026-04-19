@@ -11,7 +11,7 @@ from pathlib import Path
 class FaceRecognitionClient:
     """Client for Face Recognition API."""
     
-    def __init__(self, base_url="http://localhost:8000"):
+    def __init__(self, base_url="https://face-recognition-v01.up.railway.app/"):
         self.base_url = base_url
     
     def health_check(self):
@@ -60,7 +60,7 @@ def main():
     """Example usage of the API client."""
     
     # Initialize client
-    client = FaceRecognitionClient("http://localhost:8000")
+    client = FaceRecognitionClient("https://face-recognition-v01.up.railway.app/")
     
     print("=" * 60)
     print("Face Recognition API Client")
