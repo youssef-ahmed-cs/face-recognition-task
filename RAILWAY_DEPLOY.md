@@ -56,7 +56,7 @@ railway up
 Railway will:
 1. Detect your Python project
 2. Install dependencies from `requirements.txt`
-3. Run `python src/fastapi-deploy/app.py`
+3. Run `python -m uvicorn app:app --host 0.0.0.0 --port $PORT --app-dir src`
 4. Assign you a public URL
 
 ---
