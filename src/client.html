@@ -401,6 +401,28 @@
                     <div class="p-4 rounded-lg border hidden transition-all mb-6 fade-in" id="message"></div>
 
                     <!-- Results -->
+                    <div id="recognitionStats" class="hidden mb-6 fade-in">
+                        <h3 class="text-lg font-bold text-slate-900 mb-3">Recognition Summary</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
+                                <p class="text-xs text-slate-600">Total Faces</p>
+                                <p id="statsTotalFaces" class="text-xl font-bold text-slate-900">0</p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
+                                <p class="text-xs text-slate-600">Recognized Faces</p>
+                                <p id="statsRecognizedFaces" class="text-xl font-bold text-slate-900">0</p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
+                                <p class="text-xs text-slate-600">Unknown Faces</p>
+                                <p id="statsUnknownFaces" class="text-xl font-bold text-slate-900">0</p>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
+                                <p class="text-xs text-slate-600">Users Detected</p>
+                                <p id="statsUniqueUsers" class="text-xl font-bold text-slate-900">0</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="hidden fade-in" id="results">
                         <h3 class="text-lg font-bold text-slate-900 mb-4">Detection Results</h3>
                         <div id="detections" class="space-y-3"></div>
@@ -421,7 +443,8 @@
                                 class="action-btn theme-muted-btn font-semibold rounded-lg transition">
                                 Stop Camera
                             </button>
-                            <div class="live-status-chip theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
+                            <div
+                                class="live-status-chip theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
                                 <span id="liveStatus" class="text-sm font-semibold">Live: Off</span>
                             </div>
                         </div>
@@ -720,9 +743,29 @@
             summaryEl.textContent = `Detected ${detections.length} face${detections.length !== 1 ? 's' : ''}: ${uniqueNames}`;
         }
 
+        function updateRecognitionStats(data) {
+            const detections = data.detections || [];
+            const totalFaces = typeof data.total_faces === 'number' ? data.total_faces : detections.length;
+            const recognizedFaces = typeof data.recognized_faces === 'number'
+                ? data.recognized_faces
+                : detections.filter(d => d.name !== 'unknown').length;
+            const uniqueUsersCount = typeof data.unique_users_count === 'number'
+                ? data.unique_users_count
+                : new Set(detections.filter(d => d.name !== 'unknown').map(d => d.name)).size;
+            const unknownFaces = Math.max(0, totalFaces - recognizedFaces);
+
+            document.getElementById('statsTotalFaces').textContent = String(totalFaces);
+            document.getElementById('statsRecognizedFaces').textContent = String(recognizedFaces);
+            document.getElementById('statsUnknownFaces').textContent = String(unknownFaces);
+            document.getElementById('statsUniqueUsers').textContent = String(uniqueUsersCount);
+            document.getElementById('recognitionStats').classList.remove('hidden');
+        }
+
         function displayResults(data) {
             const resultsDiv = document.getElementById('results');
             const detectionsDiv = document.getElementById('detections');
+
+            updateRecognitionStats(data);
 
             if (data.detections.length === 0) {
                 detectionsDiv.innerHTML = '<p class="text-slate-600 py-4">No faces detected in the image.</p>';
@@ -756,6 +799,7 @@
             selectedFile = null;
             document.getElementById('preview').innerHTML = '';
             document.getElementById('results').classList.add('hidden');
+            document.getElementById('recognitionStats').classList.add('hidden');
             document.getElementById('predictBtn').disabled = true;
             document.getElementById('fileInput').value = '';
         }

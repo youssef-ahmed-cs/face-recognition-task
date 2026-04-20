@@ -182,6 +182,10 @@ async def predict(
             return {
                 "success": True,
                 "detections": [],
+                "total_faces": 0,
+                "recognized_faces": 0,
+                "unique_users_count": 0,
+                "unique_users": [],
                 "message": "No faces detected in the image",
             }
         
@@ -195,6 +199,10 @@ async def predict(
             return {
                 "success": True,
                 "detections": [],
+                "total_faces": 0,
+                "recognized_faces": 0,
+                "unique_users_count": 0,
+                "unique_users": [],
                 "message": "Faces detected but could not generate encodings",
             }
         
@@ -228,11 +236,17 @@ async def predict(
                     "left": int(loc[3]),
                 },
             })
+
+        recognized_faces = [d for d in detections if d["name"] != "unknown"]
+        unique_users = sorted({d["name"] for d in recognized_faces})
         
         return {
             "success": True,
             "detections": detections,
             "total_faces": len(detections),
+            "recognized_faces": len(recognized_faces),
+            "unique_users_count": len(unique_users),
+            "unique_users": unique_users,
         }
     
     except HTTPException:

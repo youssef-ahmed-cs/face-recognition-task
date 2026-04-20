@@ -55,8 +55,8 @@ if __name__ == "__main__":
         base_dir,
         '..',
         'persons',
-        'Moamn',
-        'tramp.jpeg',
+        'Youssef',
+        'FB_IMG_1751293757851.jpg',
     )
 
     results = predict(test_image_path)
