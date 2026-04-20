@@ -3,4 +3,4 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "python -m uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000} --app-dir src"
+startCommand = "python src/app.py"
