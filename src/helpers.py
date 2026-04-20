@@ -10,5 +10,13 @@ def enhance_image(image):
 
 
 def load_model(model_path):
-    with open(model_path, "rb") as f:
-        return pickle.load(f)
+    try:
+        with open(model_path, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+    except pickle.UnpicklingError as e:
+        raise ValueError(f"Model file corrupted or invalid: {str(e)}")
+    except Exception as e:
+        raise RuntimeError(f"Failed to load model: {str(e)}")
+

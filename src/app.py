@@ -61,7 +61,10 @@ def get_model():
         )
     
     if _model_cache is None:
-        _model_cache = load_model(MODEL_PATH)
+        try:
+            _model_cache = load_model(MODEL_PATH)
+        except Exception as e:
+            raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {str(e)}")
     
     return _model_cache
 
@@ -77,6 +80,7 @@ async def health_check():
     """Health check endpoint."""
     dependency_ok = True
     dependency_error = None
+    model_load_error = None
 
     try:
         get_face_recognition_module()
@@ -84,9 +88,18 @@ async def health_check():
         dependency_ok = False
         dependency_error = e.detail
 
+    try:
+        get_model()
+    except FileNotFoundError as e:
+        model_load_error = str(e)
+    except Exception as e:
+        model_load_error = f"Model loading failed: {str(e)}"
+
     return {
         "status": "healthy",
+        "model_path": MODEL_PATH,
         "model_exists": os.path.exists(MODEL_PATH),
+        "model_load_error": model_load_error,
         "training_data_exists": os.path.exists(TRAIN_DIR),
         "face_recognition_available": dependency_ok,
         "face_recognition_error": dependency_error,
@@ -132,8 +145,13 @@ async def predict(
         knn_clf = get_model()
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Model load error: {str(e)}")
 
-    face_recognition = get_face_recognition_module()
+    try:
+        face_recognition = get_face_recognition_module()
+    except HTTPException as e:
+        raise e
     
     # Save uploaded file temporarily
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
@@ -158,6 +176,13 @@ async def predict(
         
         # Get face encodings
         face_encodings = face_recognition.face_encodings(image, face_locations)
+        
+        if len(face_encodings) == 0:
+            return {
+                "success": True,
+                "detections": [],
+                "message": "Faces detected but could not generate encodings",
+            }
         
         # Predict using KNN
         closest_distances = knn_clf.kneighbors(face_encodings, n_neighbors=1)
@@ -200,58 +225,8 @@ async def predict(
         # Clean up temporary file
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
-
-
-@app.post("/train")
-async def train():
-    """
-    Retrain the face recognition model using images in the training directory.
-    
-    Returns:
-        Training status and results
-    """
-    try:
-        try:
-            from face_recognition_knn_classifier import knnModel
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Training dependency import failed: {str(e)}",
-            )
-
-        if not os.path.exists(TRAIN_DIR):
-            raise HTTPException(
-                status_code=404, 
-                detail=f"Training directory not found at {TRAIN_DIR}"
-            )
-        
-        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-        
-        print("Starting model training...")
-        knn_clf = knnModel(
-            train_dir=TRAIN_DIR,
-            model_save_path=MODEL_PATH,
-            n_neighbors=None,
-            detection_model="hog",
-            number_of_times_to_upsample=0,
-            use_image_enhancement=False,
-        )
-        
-        # Clear cached model so new one is loaded on next prediction
-        clear_model_cache()
-        
-        print("Training complete!")
-        
-        return {
-            "success": True,
-            "message": "Model trained successfully",
-            "model_path": MODEL_PATH,
-        }
-    
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
 
 
 @app.get("/info")
