@@ -45,18 +45,11 @@
             --shadow: rgba(0, 0, 0, 0.08);
             --shadow-hover: rgba(0, 0, 0, 0.1);
             --card-bg: white;
-        }
-
-        html.dark-mode {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-tertiary: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-            --shadow: rgba(0, 0, 0, 0.3);
-            --shadow-hover: rgba(0, 0, 0, 0.4);
-            --card-bg: #1e293b;
+            --card-border: #dbe3ee;
+            --surface-soft: #f8fafc;
+            --surface-soft-hover: #eef2f7;
+            --muted-btn-bg: #dfe7f2;
+            --muted-btn-hover: #d1dbe8;
         }
 
         .slide-in {
@@ -73,9 +66,11 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            background: radial-gradient(1200px 600px at 10% -10%, rgba(99, 102, 241, 0.12), transparent 55%),
+                radial-gradient(1000px 500px at 100% 0%, rgba(14, 165, 233, 0.12), transparent 50%),
+                linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .btn-primary {
@@ -96,8 +91,9 @@
         .card {
             border-radius: 12px;
             background: var(--card-bg);
+            border: 1px solid var(--card-border);
             box-shadow: 0 2px 8px var(--shadow);
-            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
             color: var(--text-primary);
         }
 
@@ -110,23 +106,25 @@
             border-radius: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
-            background-color: var(--bg-tertiary);
+            background-color: var(--surface-soft);
         }
 
         .upload-area:hover {
             border-color: #667eea;
-            background-color: rgba(102, 126, 234, 0.1);
+            background-color: var(--surface-soft-hover);
         }
 
         .upload-area.active {
             border-color: #667eea;
-            background-color: rgba(102, 126, 234, 0.1);
+            background-color: var(--surface-soft-hover);
+            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.35);
         }
 
         .detection-item {
-            background: var(--card-bg);
+            background: var(--surface-soft);
             border-radius: 8px;
             border-left: 4px solid #667eea;
+            border: 1px solid var(--card-border);
             transition: all 0.3s ease;
             color: var(--text-primary);
         }
@@ -158,40 +156,12 @@
             color: #0284c7;
         }
 
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px var(--shadow-hover);
-        }
-
         input[type="range"] {
             accent-color: #667eea;
         }
 
-        html.dark-mode input[type="range"] {
-            accent-color: #667eea;
-        }
-
         .bg-slate-50 {
-            background-color: var(--bg-tertiary);
+            background-color: var(--surface-soft);
             color: var(--text-primary);
         }
 
@@ -215,6 +185,10 @@
             background-color: var(--bg-secondary);
         }
 
+        .bg-white {
+            background-color: var(--card-bg);
+        }
+
         .text-slate-500 {
             color: var(--text-secondary);
         }
@@ -222,17 +196,57 @@
         .border-gray-200 {
             border-color: var(--border-color);
         }
+
+        .theme-muted-btn {
+            background-color: var(--muted-btn-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            transition: all 0.2s ease;
+        }
+
+        .theme-muted-btn:hover {
+            background-color: var(--muted-btn-hover);
+        }
+
+        .theme-chip {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        .preview-image {
+            border: 1px solid var(--card-border);
+            background: var(--surface-soft);
+        }
+
+        .theme-link {
+            color: #2563eb;
+        }
+
+        .theme-link:hover {
+            color: #1d4ed8;
+        }
+
+
+        .support-banner {
+            width: 100%;
+            text-align: center;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #111827 0%, #16a34a 45%, #dc2626 100%);
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 to-slate-100">
-    <!-- Theme Toggle Button -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Night Mode">
-        <span id="theme-icon">🌙</span>
-    </button>
-
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-5xl mx-auto">
+            <div class="support-banner mb-6 slide-in">We support Palestine</div>
+
             <!-- Header -->
             <header class="mb-8 text-center slide-in">
                 <h1 class="text-4xl font-bold text-slate-900 mb-2">Face Recognition</h1>
@@ -246,7 +260,7 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold text-slate-900">System Status</h2>
                         <button onclick="checkHealth()"
-                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg transition">
+                            class="px-4 py-2 theme-muted-btn font-medium rounded-lg transition">
                             Refresh
                         </button>
                     </div>
@@ -293,7 +307,7 @@
                         <div class="flex items-center justify-between mb-3">
                             <label for="threshold" class="font-semibold text-slate-700">Confidence Threshold</label>
                             <span id="thresholdValue"
-                                class="text-sm font-semibold text-slate-900 bg-white px-3 py-1 rounded">0.50</span>
+                                class="theme-chip text-sm font-semibold px-3 py-1 rounded">0.50</span>
                         </div>
                         <input type="range" id="threshold" min="0" max="100" value="50" step="5" class="w-full">
                         <div class="flex justify-between text-xs text-slate-500 mt-2">
@@ -309,7 +323,7 @@
                             <span id="predictBtnText">Analyze Image</span>
                         </button>
                         <button onclick="clearPrediction()"
-                            class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition">
+                            class="px-6 py-3 theme-muted-btn font-semibold rounded-lg transition">
                             Clear
                         </button>
                     </div>
@@ -327,7 +341,7 @@
                 <!-- Info Section -->
                 <div class="card p-6 slide-in text-center text-slate-600">
                     <p class="text-sm">API Docs available at <a id="docs-link" href="/docs" target="_blank"
-                            class="text-blue-600 hover:text-blue-700 font-semibold">Swagger UI</a></p>
+                            class="theme-link font-semibold">Swagger UI</a></p>
                 </div>
             </div>
         </div>
@@ -336,35 +350,6 @@
     <script>
         const API_URL = window.location.origin;
         let selectedFile = null;
-
-        // Theme Toggle
-        function toggleTheme() {
-            const html = document.documentElement;
-            const isDark = html.classList.toggle('dark-mode');
-            const icon = document.getElementById('theme-icon');
-            
-            // Save preference
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            icon.textContent = isDark ? '☀️' : '🌙';
-        }
-
-        // Initialize theme from localStorage
-        function initializeTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            
-            if (savedTheme === 'dark') {
-                html.classList.add('dark-mode');
-                icon.textContent = '☀️';
-            } else {
-                html.classList.remove('dark-mode');
-                icon.textContent = '🌙';
-            }
-        }
-
-        // Initialize theme on page load
-        initializeTheme();
 
         // Update API URL
         document.getElementById('docs-link').href = `${API_URL}/docs`;
@@ -411,7 +396,7 @@
             const reader = new FileReader();
 
             reader.onload = (e) => {
-                preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="max-w-full max-h-80 rounded-lg shadow-lg mx-auto">`;
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview" class="preview-image max-w-full max-h-80 rounded-lg shadow-lg mx-auto">`;
                 document.getElementById('predictBtn').disabled = false;
             };
 
@@ -452,8 +437,7 @@
 
             try {
                 document.getElementById('predictBtn').disabled = true;
-                document.getElementById('predictBtnText').innerHTML =
-                    '<svg class="spin-loader inline-block w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing...';
+                document.getElementById('predictBtnText').textContent = 'Analyzing...';
 
                 const response = await fetch(
                     `${API_URL}/predict?distance_threshold=${threshold}`,
