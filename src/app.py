@@ -1,13 +1,12 @@
 import os
 import tempfile
+import importlib
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-import face_recognition
 from typing import List
 
 from helpers import enhance_image, load_model
-from face_recognition_knn_classifier import knnModel
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -33,6 +32,23 @@ CLIENT_HTML_PATH = os.path.join(base_dir, 'client.html')
 
 # Global model cache
 _model_cache = None
+_face_recognition_module = None
+
+
+def get_face_recognition_module():
+    """Lazy-load face_recognition to avoid crashing app startup on missing system libs."""
+    global _face_recognition_module
+
+    if _face_recognition_module is None:
+        try:
+            _face_recognition_module = importlib.import_module("face_recognition")
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"face_recognition import failed: {str(e)}",
+            )
+
+    return _face_recognition_module
 
 
 def get_model():
@@ -59,10 +75,21 @@ def clear_model_cache():
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
+    dependency_ok = True
+    dependency_error = None
+
+    try:
+        get_face_recognition_module()
+    except HTTPException as e:
+        dependency_ok = False
+        dependency_error = e.detail
+
     return {
         "status": "healthy",
         "model_exists": os.path.exists(MODEL_PATH),
         "training_data_exists": os.path.exists(TRAIN_DIR),
+        "face_recognition_available": dependency_ok,
+        "face_recognition_error": dependency_error,
     }
 
 
@@ -99,6 +126,8 @@ async def predict(
         knn_clf = get_model()
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+    face_recognition = get_face_recognition_module()
     
     # Save uploaded file temporarily
     with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
@@ -176,6 +205,14 @@ async def train():
         Training status and results
     """
     try:
+        try:
+            from face_recognition_knn_classifier import knnModel
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Training dependency import failed: {str(e)}",
+            )
+
         if not os.path.exists(TRAIN_DIR):
             raise HTTPException(
                 status_code=404, 
