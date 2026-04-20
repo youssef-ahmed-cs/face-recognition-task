@@ -266,13 +266,54 @@
             height: 100%;
             pointer-events: none;
         }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            min-height: 48px;
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+        }
+
+        .live-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .live-status-chip {
+            min-height: 48px;
+        }
+
+        @media (min-width: 640px) {
+            .action-row {
+                grid-template-columns: minmax(0, 1fr) minmax(140px, auto);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .live-controls {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+            }
+
+            .live-status-chip {
+                min-width: 160px;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 to-slate-100">
     <div class="min-h-screen py-8 px-4">
         <div class="max-w-5xl mx-auto">
-            <div class="support-banner mb-6 slide-in">We support Palestine</div>
+            <div class="support-banner mb-6 slide-in">We support Palestine ✌︎✌︎ | ليسوا أرقامًا | أصحاب الأرض</div>
 
             <!-- Header -->
             <header class="mb-8 text-center slide-in">
@@ -345,13 +386,13 @@
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="flex gap-3 mb-6">
+                    <div class="action-row mb-6">
                         <button onclick="predict()" id="predictBtn" disabled
-                            class="flex-1 btn-primary text-white font-semibold py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="action-btn btn-primary text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
                             <span id="predictBtnText">Analyze Image</span>
                         </button>
                         <button onclick="clearPrediction()"
-                            class="px-6 py-3 theme-muted-btn font-semibold rounded-lg transition">
+                            class="action-btn theme-muted-btn font-semibold rounded-lg transition">
                             Clear
                         </button>
                     </div>
@@ -371,16 +412,16 @@
                     <h2 class="text-2xl font-bold text-slate-900 mb-6">Live Recognition</h2>
 
                     <div class="bg-slate-50 p-6 rounded-lg mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="live-controls">
                             <button onclick="startLiveRecognition()" id="startLiveBtn"
-                                class="btn-primary text-white font-semibold py-3 rounded-lg">
+                                class="action-btn btn-primary text-white font-semibold rounded-lg">
                                 Start Camera
                             </button>
                             <button onclick="stopLiveRecognition()" id="stopLiveBtn" disabled
-                                class="theme-muted-btn font-semibold py-3 rounded-lg transition">
+                                class="action-btn theme-muted-btn font-semibold rounded-lg transition">
                                 Stop Camera
                             </button>
-                            <div class="theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
+                            <div class="live-status-chip theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
                                 <span id="liveStatus" class="text-sm font-semibold">Live: Off</span>
                             </div>
                         </div>
