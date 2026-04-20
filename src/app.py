@@ -154,18 +154,29 @@ async def predict(
         raise e
     
     # Save uploaded file temporarily
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
-        contents = await file.read()
-        tmp.write(contents)
-        tmp_path = tmp.name
-    
+    tmp_path = None
     try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+            contents = await file.read()
+            tmp.write(contents)
+            tmp_path = tmp.name
+        
         # Load and process image
-        image = face_recognition.load_image_file(tmp_path)
-        image = enhance_image(image)
+        try:
+            image = face_recognition.load_image_file(tmp_path)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to load image: {str(e)}")
+        
+        try:
+            image = enhance_image(image)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Image enhancement failed: {str(e)}")
         
         # Detect faces
-        face_locations = face_recognition.face_locations(image)
+        try:
+            face_locations = face_recognition.face_locations(image)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Face detection failed: {str(e)}")
         
         if len(face_locations) == 0:
             return {
@@ -175,7 +186,10 @@ async def predict(
             }
         
         # Get face encodings
-        face_encodings = face_recognition.face_encodings(image, face_locations)
+        try:
+            face_encodings = face_recognition.face_encodings(image, face_locations)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Face encoding failed: {str(e)}")
         
         if len(face_encodings) == 0:
             return {
@@ -185,13 +199,16 @@ async def predict(
             }
         
         # Predict using KNN
-        closest_distances = knn_clf.kneighbors(face_encodings, n_neighbors=1)
+        try:
+            closest_distances = knn_clf.kneighbors(face_encodings, n_neighbors=1)
+            predictions = knn_clf.predict(face_encodings)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"KNN prediction failed: {str(e)}")
+        
         are_matches = [
             closest_distances[0][i][0] <= distance_threshold 
             for i in range(len(face_locations))
         ]
-        
-        predictions = knn_clf.predict(face_encodings)
         
         # Format results
         detections = []
@@ -218,15 +235,18 @@ async def predict(
             "total_faces": len(detections),
         }
     
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Error processing image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
     
     finally:
         # Clean up temporary file
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except:
+                pass
 
 
 @app.get("/info")

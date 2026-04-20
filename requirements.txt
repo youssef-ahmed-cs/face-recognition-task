@@ -6,4 +6,5 @@ dlib==19.24.6
 numpy>=1.26.0
 Pillow
 opencv-python-headless
+scikit-learn
 hypercorn==0.14.4
