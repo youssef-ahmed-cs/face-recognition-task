@@ -239,6 +239,33 @@
             letter-spacing: 0.2px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
         }
+
+        .live-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            background: #0f172a;
+        }
+
+        .live-video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            background: #0f172a;
+        }
+
+        .live-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -296,6 +323,7 @@
                             <p class="text-slate-600">Drag and drop your photo here or click to browse</p>
                             <p class="text-sm text-slate-500">Supported formats: JPG, PNG, GIF, WebP</p>
                         </div>
+                        <label for="fileInput" class="sr-only">Upload image file</label>
                         <input type="file" id="fileInput" accept="image/*" class="hidden">
                     </div>
 
@@ -338,6 +366,37 @@
                     </div>
                 </div>
 
+                <!-- Live Recognition Section -->
+                <div class="card p-8 slide-in">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Live Recognition</h2>
+
+                    <div class="bg-slate-50 p-6 rounded-lg mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <button onclick="startLiveRecognition()" id="startLiveBtn"
+                                class="btn-primary text-white font-semibold py-3 rounded-lg">
+                                Start Camera
+                            </button>
+                            <button onclick="stopLiveRecognition()" id="stopLiveBtn" disabled
+                                class="theme-muted-btn font-semibold py-3 rounded-lg transition">
+                                Stop Camera
+                            </button>
+                            <div class="theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
+                                <span id="liveStatus" class="text-sm font-semibold">Live: Off</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-3">Tip: Live mode sends snapshots every 1 second to the API.
+                        </p>
+                    </div>
+
+                    <div class="live-container mb-4">
+                        <video id="liveVideo" class="live-video" autoplay muted></video>
+                        <canvas id="liveOverlay" class="live-overlay"></canvas>
+                    </div>
+
+                    <div id="liveSummary" class="text-sm text-slate-600">No live detections yet.</div>
+                    <canvas id="captureCanvas" class="hidden"></canvas>
+                </div>
+
                 <!-- Info Section -->
                 <div class="card p-6 slide-in text-center text-slate-600">
                     <p class="text-sm">API Docs available at <a id="docs-link" href="/docs" target="_blank"
@@ -350,6 +409,10 @@
     <script>
         const API_URL = window.location.origin;
         let selectedFile = null;
+        let liveStream = null;
+        let liveTimer = null;
+        let isLiveRunning = false;
+        let isFrameInFlight = false;
 
         // Update API URL
         document.getElementById('docs-link').href = `${API_URL}/docs`;
@@ -458,6 +521,164 @@
             }
         }
 
+        async function startLiveRecognition() {
+            if (isLiveRunning) {
+                return;
+            }
+
+            const videoEl = document.getElementById('liveVideo');
+
+            try {
+                liveStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' },
+                    audio: false,
+                });
+
+                videoEl.srcObject = liveStream;
+                await videoEl.play();
+
+                isLiveRunning = true;
+                document.getElementById('startLiveBtn').disabled = true;
+                document.getElementById('stopLiveBtn').disabled = false;
+                document.getElementById('liveStatus').textContent = 'Live: Running';
+                showMessage('Live recognition started', 'success');
+
+                // Run recognition every second to reduce server load.
+                liveTimer = setInterval(runLiveRecognitionFrame, 1000);
+            } catch (error) {
+                showMessage('Could not access camera: ' + error.message, 'error');
+            }
+        }
+
+        function stopLiveRecognition() {
+            if (liveTimer) {
+                clearInterval(liveTimer);
+                liveTimer = null;
+            }
+
+            if (liveStream) {
+                liveStream.getTracks().forEach(track => track.stop());
+                liveStream = null;
+            }
+
+            const videoEl = document.getElementById('liveVideo');
+            const overlayEl = document.getElementById('liveOverlay');
+            const overlayCtx = overlayEl.getContext('2d');
+
+            videoEl.srcObject = null;
+            overlayCtx.clearRect(0, 0, overlayEl.width, overlayEl.height);
+
+            isLiveRunning = false;
+            isFrameInFlight = false;
+            document.getElementById('startLiveBtn').disabled = false;
+            document.getElementById('stopLiveBtn').disabled = true;
+            document.getElementById('liveStatus').textContent = 'Live: Off';
+            document.getElementById('liveSummary').textContent = 'No live detections yet.';
+        }
+
+        async function runLiveRecognitionFrame() {
+            if (!isLiveRunning || isFrameInFlight) {
+                return;
+            }
+
+            const videoEl = document.getElementById('liveVideo');
+            const captureCanvas = document.getElementById('captureCanvas');
+
+            if (!videoEl.videoWidth || !videoEl.videoHeight) {
+                return;
+            }
+
+            isFrameInFlight = true;
+
+            try {
+                const captureCtx = captureCanvas.getContext('2d');
+                captureCanvas.width = videoEl.videoWidth;
+                captureCanvas.height = videoEl.videoHeight;
+                captureCtx.drawImage(videoEl, 0, 0, captureCanvas.width, captureCanvas.height);
+
+                const blob = await new Promise(resolve => captureCanvas.toBlob(resolve, 'image/jpeg', 0.8));
+
+                if (!blob) {
+                    return;
+                }
+
+                const threshold = document.getElementById('threshold').value / 100;
+                const formData = new FormData();
+                formData.append('file', blob, 'live-frame.jpg');
+
+                const response = await fetch(
+                    `${API_URL}/predict?distance_threshold=${threshold}`,
+                    { method: 'POST', body: formData }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Live prediction request failed');
+                }
+
+                const data = await response.json();
+                drawLiveDetections(data.detections || []);
+            } catch (error) {
+                document.getElementById('liveSummary').textContent = `Live error: ${error.message}`;
+            } finally {
+                isFrameInFlight = false;
+            }
+        }
+
+        function drawLiveDetections(detections) {
+            const videoEl = document.getElementById('liveVideo');
+            const overlayEl = document.getElementById('liveOverlay');
+            const overlayCtx = overlayEl.getContext('2d');
+            const summaryEl = document.getElementById('liveSummary');
+
+            if (!videoEl.videoWidth || !videoEl.videoHeight) {
+                return;
+            }
+
+            const renderWidth = videoEl.clientWidth;
+            const renderHeight = videoEl.clientHeight;
+
+            if (overlayEl.width !== renderWidth || overlayEl.height !== renderHeight) {
+                overlayEl.width = renderWidth;
+                overlayEl.height = renderHeight;
+            }
+
+            overlayCtx.clearRect(0, 0, overlayEl.width, overlayEl.height);
+
+            if (!detections.length) {
+                summaryEl.textContent = 'No faces detected in the latest frame.';
+                return;
+            }
+
+            const scaleX = overlayEl.width / videoEl.videoWidth;
+            const scaleY = overlayEl.height / videoEl.videoHeight;
+
+            detections.forEach((det) => {
+                const box = det.bounding_box;
+                const x = box.left * scaleX;
+                const y = box.top * scaleY;
+                const width = (box.right - box.left) * scaleX;
+                const height = (box.bottom - box.top) * scaleY;
+
+                overlayCtx.lineWidth = 3;
+                overlayCtx.strokeStyle = det.name === 'unknown' ? '#dc2626' : '#16a34a';
+                overlayCtx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                overlayCtx.strokeRect(x, y, width, height);
+
+                const confidence = Math.max(0, Math.min(100, (det.confidence || 0) * 100)).toFixed(1);
+                const label = `${det.name} (${confidence}%)`;
+                overlayCtx.font = '16px Segoe UI';
+                const textWidth = overlayCtx.measureText(label).width;
+                const labelY = Math.max(22, y - 8);
+
+                overlayCtx.fillRect(x, labelY - 18, textWidth + 14, 22);
+                overlayCtx.fillStyle = '#ffffff';
+                overlayCtx.fillText(label, x + 7, labelY - 2);
+            });
+
+            const uniqueNames = [...new Set(detections.map(d => d.name))].join(', ');
+            summaryEl.textContent = `Detected ${detections.length} face${detections.length !== 1 ? 's' : ''}: ${uniqueNames}`;
+        }
+
         function displayResults(data) {
             const resultsDiv = document.getElementById('results');
             const detectionsDiv = document.getElementById('detections');
@@ -519,6 +740,10 @@
 
         // Check health on load
         checkHealth();
+
+        window.addEventListener('beforeunload', () => {
+            stopLiveRecognition();
+        });
     </script>
 </body>
 
