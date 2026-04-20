@@ -98,12 +98,18 @@ async def root():
     """Serve the built-in web client on the app root."""
     if not os.path.exists(CLIENT_HTML_PATH):
         raise HTTPException(status_code=404, detail="client.html not found")
-    return FileResponse(CLIENT_HTML_PATH)
+    return FileResponse(CLIENT_HTML_PATH, media_type="text/html")
 
 
 @app.get("/client")
 async def client_page():
     """Alias route for the web client page."""
+    return await root()
+
+
+@app.get("/client.html")
+async def client_html():
+    """Direct route to client.html."""
     return await root()
 
 
