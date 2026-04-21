@@ -16,7 +16,7 @@ def knnModel(
     model_save_path,
     n_neighbors=None,
     detection_model="hog",
-    number_of_times_to_upsample=0,
+    number_of_times_to_upsample=0, # 0: no upsampling, 1: upsample once, 2: upsample twice
     use_image_enhancement=False,
 ):
 

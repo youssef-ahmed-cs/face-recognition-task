@@ -3,10 +3,10 @@ from PIL import Image, ImageEnhance
 import numpy as np
 
 def enhance_image(image):
-    image = Image.fromarray(image)
-    enhancer = ImageEnhance.Sharpness(image)
-    image = enhancer.enhance(2.0)
-    return np.array(image)
+    image = Image.fromarray(image) # Convert numpy array to PIL Image
+    enhancer = ImageEnhance.Sharpness(image) # Create a sharpness enhancer use to enhance the image
+    image = enhancer.enhance(2.0) # Enhance the image by a factor of 2.0 (you can adjust this value as needed)
+    return np.array(image) # Convert back to numpy array for face_recognition processing
 
 
 def load_model(model_path):

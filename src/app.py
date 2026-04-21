@@ -36,7 +36,6 @@ _face_recognition_module = None
 
 
 def get_face_recognition_module(): # load face_recognition module on demand to handle missing dependencies gracefully
-    """Lazy-load face_recognition to avoid crashing app startup on missing system libs."""
     global _face_recognition_module
 
     if _face_recognition_module is None:
@@ -182,10 +181,10 @@ async def predict(
         
         # Get face encodings
         try:
-            face_encodings = face_recognition.face_encodings(image, face_locations)
+            face_encodings = face_recognition.face_encodings(image, face_locations) # embeddings for detected faces
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Face encoding failed: {str(e)}")
-        
+
         if len(face_encodings) == 0:
             return {
                 "success": True,
@@ -203,7 +202,7 @@ async def predict(
             predictions = knn_clf.predict(face_encodings)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"KNN prediction failed: {str(e)}")
-        
+            
         are_matches = [
             closest_distances[0][i][0] <= distance_threshold 
             for i in range(len(face_locations))

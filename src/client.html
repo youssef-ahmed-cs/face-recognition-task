@@ -89,40 +89,44 @@
         }
 
         .card {
-            border-radius: 12px;
+            border-radius: 16px;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            box-shadow: 0 2px 8px var(--shadow);
-            transition: box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease;
             color: var(--text-primary);
+            backdrop-filter: blur(10px);
         }
 
         .card:hover {
-            box-shadow: 0 8px 16px var(--shadow-hover);
+            box-shadow: 0 12px 24px var(--shadow-hover);
+            border-color: #667eea;
+            transform: translateY(-2px);
         }
 
         .upload-area {
             border: 2px dashed var(--border-color);
-            border-radius: 12px;
+            border-radius: 16px;
             transition: all 0.3s ease;
             cursor: pointer;
-            background-color: var(--surface-soft);
+            background: linear-gradient(135deg, var(--surface-soft) 0%, rgba(99, 102, 241, 0.05) 100%);
         }
 
         .upload-area:hover {
             border-color: #667eea;
-            background-color: var(--surface-soft-hover);
+            background: linear-gradient(135deg, var(--surface-soft-hover) 0%, rgba(99, 102, 241, 0.1) 100%);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
         }
 
         .upload-area.active {
             border-color: #667eea;
-            background-color: var(--surface-soft-hover);
-            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.35);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.15) 100%);
+            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.35), 0 8px 16px rgba(102, 126, 234, 0.15);
         }
 
         .detection-item {
-            background: var(--surface-soft);
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--surface-soft) 0%, rgba(99, 102, 241, 0.05) 100%);
+            border-radius: 12px;
             border-left: 4px solid #667eea;
             border: 1px solid var(--card-border);
             transition: all 0.3s ease;
@@ -130,7 +134,9 @@
         }
 
         .detection-item:hover {
-            box-shadow: 0 4px 12px var(--shadow-hover);
+            box-shadow: 0 6px 16px var(--shadow-hover);
+            transform: translateX(4px);
+            border-color: #667eea;
         }
 
         .status-badge {
@@ -231,13 +237,14 @@
         .support-banner {
             width: 100%;
             text-align: center;
-            padding: 12px 16px;
-            border-radius: 10px;
-            background: linear-gradient(90deg, #111827 0%, #16a34a 45%, #dc2626 100%);
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #111827 0%, #16a34a 50%, #dc2626 100%);
             color: #ffffff;
             font-weight: 700;
-            letter-spacing: 0.2px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16);
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
         }
 
         .live-container {
@@ -316,53 +323,68 @@
             <div class="support-banner mb-6 slide-in">We support Palestine ✌︎✌︎</div>
 
             <!-- Header -->
-            <header class="mb-8 text-center slide-in">
-                <h1 class="text-4xl font-bold text-slate-900 mb-2">Face Recognition</h1>
-                <p class="text-slate-600 text-lg">Advanced face detection and identification</p>
+            <header class="mb-12 text-center slide-in">
+                <div class="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full">
+                    <span class="text-sm font-semibold text-indigo-900">👤 AI-Powered Recognition</span>
+                </div>
+                <h1
+                    class="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+                    Face Recognition</h1>
+                <p class="text-slate-600 text-lg font-medium">Advanced face detection and identification powered by KNN
+                </p>
             </header>
 
             <!-- Main Content Grid -->
             <div class="space-y-6">
                 <!-- Status Card -->
-                <div class="card p-6 slide-in">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-slate-900">System Status</h2>
+                <div class="card p-8 slide-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-900">🔍 System Status</h2>
+                            <p class="text-sm text-slate-600 mt-1">Real-time health metrics</p>
+                        </div>
                         <button onclick="checkHealth()"
-                            class="px-4 py-2 theme-muted-btn font-medium rounded-lg transition">
-                            Refresh
+                            class="px-5 py-2 theme-muted-btn font-medium rounded-lg transition hover:bg-indigo-100">
+                            🔄 Refresh
                         </button>
                     </div>
 
                     <div class="grid grid-cols-3 gap-4">
-                        <div class="p-4 bg-slate-50 rounded-lg">
-                            <p class="text-sm text-slate-600 mb-2">Server Status</p>
-                            <p class="text-2xl font-bold text-slate-900" id="server-status">
+                        <div class="p-5 bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl border border-blue-100">
+                            <p class="text-xs font-semibold text-slate-600 mb-3 uppercase tracking-wide">🖥️ Server</p>
+                            <p class="text-lg font-bold text-slate-900" id="server-status">
                                 <span class="status-badge status-loading">Checking...</span>
                             </p>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-lg">
-                            <p class="text-sm text-slate-600 mb-2">Model Status</p>
-                            <p class="text-2xl font-bold text-slate-900" id="model-status">
+                        <div
+                            class="p-5 bg-gradient-to-br from-slate-50 to-purple-50 rounded-xl border border-purple-100">
+                            <p class="text-xs font-semibold text-slate-600 mb-3 uppercase tracking-wide">🤖 Model</p>
+                            <p class="text-lg font-bold text-slate-900" id="model-status">
                                 <span class="status-badge status-loading">Checking...</span>
                             </p>
                         </div>
-                        <div class="p-4 bg-slate-50 rounded-lg">
-                            <p class="text-sm text-slate-600 mb-2">Classes</p>
-                            <p class="text-sm font-medium text-slate-900" id="classes">Loading...</p>
+                        <div class="p-5 bg-gradient-to-br from-slate-50 to-pink-50 rounded-xl border border-pink-100">
+                            <p class="text-xs font-semibold text-slate-600 mb-3 uppercase tracking-wide">👥 Classes</p>
+                            <p class="text-sm font-medium text-slate-900 line-clamp-2" id="classes">Loading...</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Prediction Section -->
                 <div class="card p-8 slide-in">
-                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Face Detection</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">📸 Face Detection</h2>
+                    <p class="text-slate-600 text-sm mb-6">Upload an image to identify faces and retrieve detailed
+                        recognition results</p>
 
                     <!-- Upload Area -->
-                    <div id="uploadArea" class="upload-area p-12 text-center mb-6">
-                        <div class="space-y-3">
-                            <p class="text-2xl font-semibold text-slate-900">Upload an Image</p>
-                            <p class="text-slate-600">Drag and drop your photo here or click to browse</p>
-                            <p class="text-sm text-slate-500">Supported formats: JPG, PNG, GIF, WebP</p>
+                    <div id="uploadArea" class="upload-area p-12 text-center mb-6 border-2">
+                        <div class="space-y-4">
+                            <div class="text-5xl animate-bounce">📁</div>
+                            <div>
+                                <p class="text-2xl font-bold text-slate-900">Drag your image here</p>
+                                <p class="text-slate-600 mt-2">or click to browse from your device</p>
+                            </div>
+                            <p class="text-xs text-slate-500 font-medium">JPG, PNG, GIF, WebP • Max 10MB</p>
                         </div>
                         <label for="fileInput" class="sr-only">Upload image file</label>
                         <input type="file" id="fileInput" accept="image/*" class="hidden">
@@ -372,28 +394,35 @@
                     <div id="preview" class="mb-6 text-center"></div>
 
                     <!-- Confidence Threshold -->
-                    <div class="bg-slate-50 p-6 rounded-lg mb-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <label for="threshold" class="font-semibold text-slate-700">Confidence Threshold</label>
+                    <div
+                        class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-xl mb-6 border border-indigo-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <label for="threshold" class="font-semibold text-slate-900">🎯 Confidence
+                                    Threshold</label>
+                                <p class="text-xs text-slate-600 mt-1">Adjust recognition sensitivity</p>
+                            </div>
                             <span id="thresholdValue"
-                                class="theme-chip text-sm font-semibold px-3 py-1 rounded">0.50</span>
+                                class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-md">0.50</span>
                         </div>
-                        <input type="range" id="threshold" min="0" max="100" value="50" step="5" class="w-full">
-                        <div class="flex justify-between text-xs text-slate-500 mt-2">
-                            <span>More Strict</span>
-                            <span>More Lenient</span>
+                        <input type="range" id="threshold" min="0" max="100" value="50" step="5"
+                            class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer"
+                            style="accent-color: #667eea;">
+                        <div class="flex justify-between text-xs text-slate-600 mt-3 font-medium">
+                            <span>🔒 Strict</span>
+                            <span>🔓 Lenient</span>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="action-row mb-6">
                         <button onclick="predict()" id="predictBtn" disabled
-                            class="action-btn btn-primary text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span id="predictBtnText">Analyze Image</span>
+                            class="action-btn btn-primary text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg">
+                            <span id="predictBtnText">⚡ Analyze Image</span>
                         </button>
                         <button onclick="clearPrediction()"
-                            class="action-btn theme-muted-btn font-semibold rounded-lg transition">
-                            Clear
+                            class="action-btn theme-muted-btn font-semibold rounded-lg transition hover:bg-slate-200">
+                            🗑️ Clear
                         </button>
                     </div>
 
@@ -402,53 +431,63 @@
 
                     <!-- Results -->
                     <div id="recognitionStats" class="hidden mb-6 fade-in">
-                        <h3 class="text-lg font-bold text-slate-900 mb-3">Recognition Summary</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
-                                <p class="text-xs text-slate-600">Total Faces</p>
-                                <p id="statsTotalFaces" class="text-xl font-bold text-slate-900">0</p>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">📊 Recognition Summary</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div
+                                class="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100 hover:shadow-md transition">
+                                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">👥 Total
+                                </p>
+                                <p id="statsTotalFaces" class="text-2xl font-bold text-blue-600">0</p>
                             </div>
-                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
-                                <p class="text-xs text-slate-600">Recognized Faces</p>
-                                <p id="statsRecognizedFaces" class="text-xl font-bold text-slate-900">0</p>
+                            <div
+                                class="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition">
+                                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">✅
+                                    Recognized</p>
+                                <p id="statsRecognizedFaces" class="text-2xl font-bold text-green-600">0</p>
                             </div>
-                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
-                                <p class="text-xs text-slate-600">Unknown Faces</p>
-                                <p id="statsUnknownFaces" class="text-xl font-bold text-slate-900">0</p>
+                            <div
+                                class="p-4 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border border-red-100 hover:shadow-md transition">
+                                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">❓ Unknown
+                                </p>
+                                <p id="statsUnknownFaces" class="text-2xl font-bold text-red-600">0</p>
                             </div>
-                            <div class="p-3 bg-slate-50 rounded-lg border border-gray-200">
-                                <p class="text-xs text-slate-600">Users Detected</p>
-                                <p id="statsUniqueUsers" class="text-xl font-bold text-slate-900">0</p>
+                            <div
+                                class="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100 hover:shadow-md transition">
+                                <p class="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">⭐ Users</p>
+                                <p id="statsUniqueUsers" class="text-2xl font-bold text-purple-600">0</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="hidden fade-in" id="results">
-                        <h3 class="text-lg font-bold text-slate-900 mb-4">Detection Results</h3>
-                        <div id="detections" class="space-y-3"></div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-4">🎯 Detection Results</h3>
+                        <div id="detections" class="space-y-4"></div>
                     </div>
                 </div>
 
                 <!-- Live Recognition Section -->
                 <div class="card p-8 slide-in">
-                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Live Recognition</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 mb-2">🎥 Live Recognition</h2>
+                    <p class="text-slate-600 text-sm mb-6">Real-time face detection from your webcam</p>
 
-                    <div class="bg-slate-50 p-6 rounded-lg mb-6">
+                    <div
+                        class="bg-gradient-to-r from-slate-50 to-indigo-50 p-6 rounded-xl mb-6 border border-indigo-100">
                         <div class="live-controls">
                             <button onclick="startLiveRecognition()" id="startLiveBtn"
-                                class="action-btn btn-primary text-white font-semibold rounded-lg">
-                                Start Camera
+                                class="action-btn btn-primary text-white font-semibold rounded-lg hover:shadow-lg">
+                                ▶️ Start Camera
                             </button>
                             <button onclick="stopLiveRecognition()" id="stopLiveBtn" disabled
-                                class="action-btn theme-muted-btn font-semibold rounded-lg transition">
-                                Stop Camera
+                                class="action-btn theme-muted-btn font-semibold rounded-lg transition hover:bg-slate-200">
+                                ⏹️ Stop Camera
                             </button>
                             <div
-                                class="live-status-chip theme-chip rounded-lg px-4 py-3 flex items-center justify-center">
-                                <span id="liveStatus" class="text-sm font-semibold">Live: Off</span>
+                                class="live-status-chip theme-chip rounded-lg px-4 py-3 flex items-center justify-center font-semibold">
+                                <span id="liveStatus" class="text-sm">🔴 Live: Off</span>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-500 mt-3">Tip: Live mode sends snapshots every 1 second to the API.
+                        <p class="text-xs text-slate-600 mt-3 font-medium">💡 Live mode processes snapshots every
+                            second. Grant camera permission when prompted.
                         </p>
                     </div>
 
@@ -462,9 +501,10 @@
                 </div>
 
                 <!-- Info Section -->
-                <div class="card p-6 slide-in text-center text-slate-600">
-                    <p class="text-sm">API Docs available at <a id="docs-link" href="/docs" target="_blank"
-                            class="theme-link font-semibold">Swagger UI</a></p>
+                <div class="card p-6 slide-in text-center">
+                    <p class="text-slate-600 text-sm">📚 Interactive API documentation available at <a id="docs-link"
+                            href="/docs" target="_blank"
+                            class="text-indigo-600 font-semibold hover:text-indigo-700 underline">Swagger UI</a></p>
                 </div>
             </div>
         </div>
@@ -604,7 +644,7 @@
                 isLiveRunning = true;
                 document.getElementById('startLiveBtn').disabled = true;
                 document.getElementById('stopLiveBtn').disabled = false;
-                document.getElementById('liveStatus').textContent = 'Live: Running';
+                document.getElementById('liveStatus').textContent = '🟢 Live: Running';
                 showMessage('Live recognition started', 'success');
 
                 // Run recognition every second to reduce server load.
@@ -636,7 +676,7 @@
             isFrameInFlight = false;
             document.getElementById('startLiveBtn').disabled = false;
             document.getElementById('stopLiveBtn').disabled = true;
-            document.getElementById('liveStatus').textContent = 'Live: Off';
+            document.getElementById('liveStatus').textContent = '🔴 Live: Off';
             document.getElementById('liveSummary').textContent = 'No live detections yet.';
         }
 
@@ -776,16 +816,22 @@
             let html = '';
             data.detections.forEach((det, i) => {
                 const confidence = (det.confidence * 100).toFixed(1);
+                const emoji = det.name === 'unknown' ? '❓' : '✅';
                 html += `
-                    <div class="detection-item p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="text-lg font-bold text-slate-900">Face ${i + 1}: <span class="text-blue-600">${det.name}</span></div>
-                            <div class="text-sm font-semibold text-slate-600">${confidence}%</div>
+                    <div class="detection-item p-5">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <div class="text-sm font-semibold text-slate-600 mb-1">Face Detection ${i + 1}</div>
+                                <div class="text-xl font-bold text-slate-900">${emoji} <span class="text-indigo-600">${det.name}</span></div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-3 py-1 rounded-full">${confidence}%</div>
+                            </div>
                         </div>
-                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all" style="width: ${confidence}%"></div>
+                        <div class="w-full bg-slate-300 h-3 rounded-full overflow-hidden shadow-sm">
+                            <div class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all" style="width: ${confidence}%"></div>
                         </div>
-                        <small class="text-slate-500 block mt-2">Box: (${det.bounding_box.left}, ${det.bounding_box.top}) → (${det.bounding_box.right}, ${det.bounding_box.bottom})</small>
+                        <small class="text-slate-500 block mt-3 text-xs font-mono">📍 Position: (${det.bounding_box.left}, ${det.bounding_box.top}) → (${det.bounding_box.right}, ${det.bounding_box.bottom})</small>
                     </div>
                 `;
             });
@@ -810,11 +856,16 @@
             msgDiv.className = 'p-4 rounded-lg border hidden transition-all fade-in mb-6';
 
             if (type === 'error') {
-                msgDiv.className = 'p-4 rounded-lg border bg-red-50 border-red-200 text-red-800 transition-all fade-in mb-6';
+                msgDiv.className = 'p-4 rounded-lg border bg-red-50 border-red-300 text-red-800 transition-all fade-in mb-6 font-medium shadow-sm flex items-center gap-2';
+                msgDiv.innerHTML = `<span>❌</span><span>${text}</span>`;
             } else if (type === 'success') {
-                msgDiv.className = 'p-4 rounded-lg border bg-green-50 border-green-200 text-green-800 transition-all fade-in mb-6';
+                msgDiv.className = 'p-4 rounded-lg border bg-green-50 border-green-300 text-green-800 transition-all fade-in mb-6 font-medium shadow-sm flex items-center gap-2';
+                msgDiv.innerHTML = `<span>✅</span><span>${text}</span>`;
+                return;
             } else if (type === 'info') {
-                msgDiv.className = 'p-4 rounded-lg border bg-blue-50 border-blue-200 text-blue-800 transition-all fade-in mb-6';
+                msgDiv.className = 'p-4 rounded-lg border bg-blue-50 border-blue-300 text-blue-800 transition-all fade-in mb-6 font-medium shadow-sm flex items-center gap-2';
+                msgDiv.innerHTML = `<span>ℹ️</span><span>${text}</span>`;
+                return;
             }
 
             msgDiv.classList.remove('hidden');

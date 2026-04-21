@@ -24,9 +24,9 @@ def predict(image_path, distance_threshold=0.5):
     if len(face_locations) == 0:
         return []
 
-    face_encodings = face_recognition.face_encodings(image,face_locations)
+    face_encodings = face_recognition.face_encodings(image,face_locations) # Get the face encodings for each face detected in the image
 
-    closest_distances = knn_clf.kneighbors(face_encodings, n_neighbors=1)
+    closest_distances = knn_clf.kneighbors(face_encodings, n_neighbors=1) # Get the distance to the closest neighbor for each encoding
     # distance and index of closest neighbor for each encoding
 
     are_matches = [closest_distances[0][i][0] <= distance_threshold for i in range(len(face_locations))]
