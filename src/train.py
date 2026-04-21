@@ -17,7 +17,7 @@ knn_clf = knnModel(
     n_neighbors=None,
     detection_model="hog",
     number_of_times_to_upsample=0,
-    use_image_enhancement=False,
+    use_image_enhancement=True,
 )
 
 print("Training complete!")

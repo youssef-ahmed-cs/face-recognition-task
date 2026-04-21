@@ -9,14 +9,14 @@ from typing import List
 from helpers import enhance_image, load_model
 
 # Initialize FastAPI app
-app = FastAPI(
+app = FastAPI( #create FastAPI instance with metadata
     title="Face Recognition API",
     description="API for face recognition using KNN classifier",
     version="1.0.0",
 )
 
 # Add CORS middleware
-app.add_middleware(
+app.add_middleware( # allow to accept requests from any origin (for development purposes)
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
@@ -31,11 +31,11 @@ TRAIN_DIR = os.path.join(base_dir, '..', 'persons')
 CLIENT_HTML_PATH = os.path.join(base_dir, 'client.html')
 
 # Global model cache
-_model_cache = None
+_model_cache = None # Cached model instance to avoid reloading on every request
 _face_recognition_module = None
 
 
-def get_face_recognition_module():
+def get_face_recognition_module(): # load face_recognition module on demand to handle missing dependencies gracefully
     """Lazy-load face_recognition to avoid crashing app startup on missing system libs."""
     global _face_recognition_module
 
@@ -131,18 +131,9 @@ async def predict(
     file: UploadFile = File(...),
     distance_threshold: float = Query(0.5, ge=0.0, le=1.0),
 ):
-    """
-    Predict face identities from an uploaded image.
-    
-    Args:
-        file: Image file (JPG, PNG, etc.)
-        distance_threshold: Confidence threshold for predictions (0-1)
-    
-    Returns:
-        List of detected faces with names and bounding boxes
-    """
+
     try:
-        knn_clf = get_model()
+        knn_clf = get_model() # load model (cached or from disk) and handle errors gracefully
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
@@ -178,7 +169,7 @@ async def predict(
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Face detection failed: {str(e)}")
         
-        if len(face_locations) == 0:
+        if len(face_locations) == 0: # No faces detected
             return {
                 "success": True,
                 "detections": [],
@@ -284,6 +275,6 @@ async def get_info():
 
 
 if __name__ == "__main__":
-    import uvicorn
+    import uvicorn # serve the app using uvicorn ASGI server
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
