@@ -6,7 +6,9 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 
-from helpers import enhance_image, load_model
+# from helpers import enhance_image, load_model
+from .helpers import enhance_image, load_model
+
 
 # Initialize FastAPI app
 app = FastAPI( #create FastAPI instance with metadata
